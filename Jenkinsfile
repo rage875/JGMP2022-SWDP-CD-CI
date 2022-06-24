@@ -19,5 +19,13 @@ pipeline {
         '''
       }
     }
+    stage('Dockerize') {
+      steps {
+        sh '''
+          docker build -t ./SWDP-CD-CI/swdp-cd-ci .
+          echo "Dockerize stage finished"
+        '''
+      }
+    }
   }
 }
