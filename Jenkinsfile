@@ -1,31 +1,27 @@
 pipeline {
-  agent {
-    docker { image 'maven:3.8.1-openjdk-11'}
-  }
-  stages {
-    stage('Pre-build') {
-      steps {
-        sh '''
-          mvn --version
-          echo "Pre-build stage finished"
-        '''
-      }
+    agent any
+    stages {
+        stage('Build') {
+            agent {
+                docker {
+                    image 'maven:3.8.6-openjdk-11'
+                }
+            }
+            steps {
+                sh '''
+                    mvn -f ./SWDP-CD-CI clean install
+                    echo "Build stage finished"
+                '''
+            }
+        }
+        stage('Dockerize') {
+            steps {
+                sh '''
+                    docker -v
+                    docker build -t jgmp2022/swdp-cd-ci SWDP-CD-CI
+                    echo "Dockerize stage finished"
+                '''
+            }
+        }
     }
-    stage('Build') {
-      steps {
-        sh '''
-          mvn -f ./SWDP-CD-CI clean install
-          echo "Build stage finished"
-        '''
-      }
-    }
-    stage('Dockerize') {
-      steps {
-        sh '''
-          docker build -t ./SWDP-CD-CI/swdp-cd-ci .
-          echo "Dockerize stage finished"
-        '''
-      }
-    }
-  }
 }
