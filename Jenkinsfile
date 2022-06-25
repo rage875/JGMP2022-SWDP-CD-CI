@@ -11,6 +11,7 @@ pipeline {
             }
             steps {
                 sh '''
+                    mvn -v
                     mvn -f ./SWDP-CD-CI clean install
                     echo "Build stage finished"
                 '''
