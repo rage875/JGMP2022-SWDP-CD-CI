@@ -19,11 +19,19 @@ pipeline {
         }
         stage('Dockerize') {
             steps {
-                sh '''
-                    docker -v
-                    docker build -t jgmp2022/swdp-cd-ci SWDP-CD-CI
-                    echo "Dockerize stage finished"
-                '''
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                    sh 'docker -v'
+                    sh "docker build -t ${env.dockerHubUser}/jgmp2022_swdp-cd-ci SWDP-CD-CI"
+                    sh 'echo "Dockerize stage finished"'
+                }
+            }
+        }
+        stage('Publish') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                    sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPassword}"
+                    sh "docker push ${env.dockerHubUser}/jgmp2022_swdp-cd-ci:latest"
+                }
             }
         }
     }
