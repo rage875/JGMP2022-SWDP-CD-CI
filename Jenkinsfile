@@ -34,5 +34,19 @@ pipeline {
                 }
             }
         }
+        stage('Deploy') {
+            steps {
+                script {
+                    kubernetesDeploy(configs: "deployment.yml", kubeconfigId: "kubeconfig")
+                }
+            }
+        }
+        stage('Clean') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPassword', usernameVariable: 'dockerHubUser')]) {
+                    sh "docker rmi maven:3.8.6-openjdk-11 ${env.dockerHubUser}/jgmp2022_swdp-cd-ci:latest"
+                }
+            }
+        }
     }
 }
